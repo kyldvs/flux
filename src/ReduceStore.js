@@ -19,6 +19,30 @@ var Store = require('./Store');
 var abstractMethod = require('./abstractMethod');
 var invariant = require('./invariant');
 
+/**
+ * This store allows defining an initial state and reducing a stream of actions
+ * over it. A simple implementation might look like this:
+ *
+ *   class FooStore extends FluxMapStore {
+ *     getInitialState() {
+ *       return 0;
+ *     }
+ *
+ *     reduce(state, action) {
+ *       switch (action.type) {
+ *         case 'add-ten':
+ *           return state + 10;
+ *         case 'square':
+ *           return state * state;
+ *         default:
+ *           return state;
+ *       }
+ *     }
+ *   }
+ *
+ * We recommend using an immutable structure for your state. If you do not, be
+ * sure to override areEqual to handle the shape of your state object.
+ */
 class ReduceStore<State> extends Store {
 
   // private

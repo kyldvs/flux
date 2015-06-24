@@ -87,8 +87,14 @@ class Store {
    *
    * @public
    */
-  addListener(callback: (eventType?: string) => void): Object {
-    return this.__emitter.addListener(this.__changeEvent, callback);
+  addListener(callback: (eventType?: string) => void): {remove: () => void} {
+    this.__emitter.addListener(this.__changeEvent, callback);
+
+    // Return a token to easily remove the callback from the emitter
+    var remove = () => {
+      this.__emitter.removeListener(this.__changeEvent, callback);
+    };
+    return {remove};
   }
 
   /**

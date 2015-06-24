@@ -111,5 +111,4 @@ describe('Store', () => {
     expect(typeof mockAddListener.mock.calls[0][0]).toBe('string');
     expect(typeof mockAddListener.mock.calls[0][1]).toBe('function');
   });
-
 });
