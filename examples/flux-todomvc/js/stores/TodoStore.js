@@ -40,7 +40,7 @@ class Todo extends TodoRecord {
 class TodoStore extends Flux.MapStore {
   reduce(state, action) {
     switch (action.actionType) {
-      case TODOConstants.TODO_CREATE:
+      case TodoConstants.TODO_CREATE:
         return createTodo(state, action.text.trim());
 
       case TodoConstants.TODO_TOGGLE_COMPLETE_ALL:
@@ -74,6 +74,12 @@ class TodoStore extends Flux.MapStore {
       default:
         return state;
     }
+  }
+
+  areAllComplete() {
+    return this.getState().every(function (value) {
+      return value.complete;
+    });
   }
 }
 

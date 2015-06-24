@@ -32,6 +32,7 @@ describe('TodoStore', function() {
 
   beforeEach(function() {
     AppDispatcher = require('../../dispatcher/AppDispatcher');
+    AppDispatcher.isDispatching = jest.genMockFn().mockImpl(() => true);
     TodoStore = require('../TodoStore');
     callback = AppDispatcher.register.mock.calls[0][0];
   });
@@ -41,49 +42,51 @@ describe('TodoStore', function() {
   });
 
   it('should initialize with no to-do items', function() {
-    var all = TodoStore.getAll();
-    expect(all).toEqual({});
+    var all = TodoStore.getState();
+    expect(all.toJS()).toEqual({});
   });
 
   it('creates a to-do item', function() {
     callback(actionTodoCreate);
-    var all = TodoStore.getAll();
-    var keys = Object.keys(all);
-    expect(keys.length).toBe(1);
-    expect(all[keys[0]].text).toEqual('foo');
+    var state = TodoStore.getState();
+    var id = state.first().id;
+    expect(state.size).toBe(1);
+    expect(TodoStore.get(id).text).toBe('foo');
   });
 
   it('destroys a to-do item', function() {
     callback(actionTodoCreate);
-    var all = TodoStore.getAll();
-    var keys = Object.keys(all);
-    expect(keys.length).toBe(1);
-    actionTodoDestroy.id = keys[0];
+    var state = TodoStore.getState();
+    var id = state.first().id;
+    expect(state.size).toBe(1);
+    expect(TodoStore.get(id).text).toBe('foo');
+
+    actionTodoDestroy.id = id;
     callback(actionTodoDestroy);
-    expect(all[keys[0]]).toBeUndefined();
+    expect(TodoStore.getState().size).toBe(0);
   });
 
   it('can determine whether all to-do items are complete', function() {
-    var i = 0;
-    for (; i < 3; i++) {
-      callback(actionTodoCreate);
-    }
-    expect(Object.keys(TodoStore.getAll()).length).toBe(3);
+    callback(actionTodoCreate);
+    callback(actionTodoCreate);
+    callback(actionTodoCreate);
+
     expect(TodoStore.areAllComplete()).toBe(false);
 
-    var all = TodoStore.getAll();
-    for (key in all) {
+    TodoStore.getState().forEach(function (value) {
       callback({
         actionType: TodoConstants.TODO_COMPLETE,
-        id: key
+        id: value.id
       });
-    }
+    });
+
     expect(TodoStore.areAllComplete()).toBe(true);
 
     callback({
       actionType: TodoConstants.TODO_UNDO_COMPLETE,
-      id: key
+      id: TodoStore.getState().first().id
     });
+
     expect(TodoStore.areAllComplete()).toBe(false);
   });
 

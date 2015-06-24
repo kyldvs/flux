@@ -24,12 +24,13 @@ var MainSection = React.createClass({
    * @return {object}
    */
   render: function() {
+    var allTodos = this.props.allTodos;
+    
     // This section should be hidden by default and shown when there are todos.
     if (allTodos.size < 1) {
       return null;
     }
 
-    var allTodos = this.props.allTodos;
     var todos = allTodos.map(function (todo) {
       return <TodoItem key={todo.id} todo={todo} />;
     });

@@ -21,19 +21,17 @@ var MainSection = require('./MainSection.react');
 var React = require('react');
 var TodoStore = require('../stores/TodoStore');
 
-class TodoApp extends React.Component {
-  static getStores() {
-    return [TodoStore];
-  }
+var TodoApp = React.createClass({
+  mixins: [Flux.Mixin([TodoStore])],
 
-  static calculateState(prevState) {
-    return {
-      allTodos: TodoStore.getState(),
-      areAllComplete: TodoStore.getState().every(function(value) {
-        return value.complete;
-      }),
-    };
-  }
+  statics: {
+    calculateState(prevState) {
+      return {
+        allTodos: TodoStore.getState(),
+        areAllComplete: TodoStore.areAllComplete(),
+      };
+    }
+  },
 
   render() {
     return (
@@ -46,7 +44,7 @@ class TodoApp extends React.Component {
         <Footer allTodos={this.state.allTodos} />
       </div>
   	);
-  }
-}
+  },
+});
 
-module.exports = Flux.Container.create(TodoApp);
+module.exports = TodoApp;
