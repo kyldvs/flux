@@ -7,4 +7,8 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
-module.exports.Dispatcher = require('./lib/Dispatcher')
+module.exports.Dispatcher = require('./lib/Dispatcher');
+module.exports.MapStore = require('./lib/MapStore');
+module.exports.ReactDispatcher = require('./lib/ReactDispatcher');
+module.exports.ReduceStore = require('./lib/ReduceStore');
+module.exports.Store = require('./lib/Store');
