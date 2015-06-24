@@ -7,6 +7,7 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
+var Immutable = require('immutable');
 var React = require('react');
 var ReactPropTypes = React.PropTypes;
 var TodoActions = require('../actions/TodoActions');
@@ -14,7 +15,7 @@ var TodoActions = require('../actions/TodoActions');
 var Footer = React.createClass({
 
   propTypes: {
-    allTodos: ReactPropTypes.object.isRequired
+    allTodos: ReactPropTypes.instanceOf(Immutable.Map).isRequired,
   },
 
   /**
@@ -22,18 +23,18 @@ var Footer = React.createClass({
    */
   render: function() {
     var allTodos = this.props.allTodos;
-    var total = Object.keys(allTodos).length;
 
+    var total = allTodos.size;
     if (total === 0) {
       return null;
     }
 
     var completed = 0;
-    for (var key in allTodos) {
-      if (allTodos[key].complete) {
+    allTodos.forEach(function(todo) {
+      if (todo.complete) {
         completed++;
       }
-    }
+    });
 
     var itemsLeft = total - completed;
     var itemsLeftPhrase = itemsLeft === 1 ? ' item ' : ' items ';

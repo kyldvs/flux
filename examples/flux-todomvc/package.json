@@ -5,12 +5,14 @@
   "repository": "https://github.com/facebook/flux",
   "main": "js/app.js",
   "dependencies": {
-    "flux": "^2.0.1",
+    "flux": "^2.0.3",
+    "immutable": "^3.7.4",
     "keymirror": "~0.1.0",
     "object-assign": "^1.0.0",
     "react": "^0.12.0"
   },
   "devDependencies": {
+    "babelify": "^6.1.2",
     "browserify": "^6.2.0",
     "envify": "^3.0.0",
     "jest-cli": "^0.4.3",
@@ -20,7 +22,7 @@
   },
   "scripts": {
     "start": "watchify -o js/bundle.js -v -d js/app.js",
-    "build": "browserify . -t [envify --NODE_ENV production] | uglifyjs -cm > js/bundle.min.js",
+    "build": "browserify . -t [reactify --es6] -t [envify --NODE_ENV production] | uglifyjs -cm > js/bundle.min.js",
     "test": "jest"
   },
   "author": "Bill Fisher",
