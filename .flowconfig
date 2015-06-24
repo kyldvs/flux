@@ -1,6 +1,7 @@
 [ignore]
 .*/lib/.*
-.*/node_modules/.*
+.*/node_modules/gulp-babel/.*
+.*/node_modules/jest-cli/.*
 
 [include]
 
