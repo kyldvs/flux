@@ -7,7 +7,7 @@
 [include]
 
 [libs]
-flow
+flow/lib
 
 [options]
 module.system=haste
