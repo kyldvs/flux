@@ -20,15 +20,17 @@ module.exports.Dispatcher = require('./lib/Dispatcher')
  * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @providesModule Dispatcher
- * @typechecks
+ * 
  * @preventMunge
  */
 
 'use strict';
 
+exports.__esModule = true;
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var invariant = require('./invariant');
+var invariant = require('fbjs/lib/invariant');
 
 var _prefix = 'ID_';
 
@@ -124,20 +126,16 @@ var Dispatcher = (function () {
   function Dispatcher() {
     _classCallCheck(this, Dispatcher);
 
-    this._lastID = 1;
     this._callbacks = {};
-    this._isPending = {};
-    this._isHandled = {};
     this._isDispatching = false;
-    this._pendingPayload = null;
+    this._isHandled = {};
+    this._isPending = {};
+    this._lastID = 1;
   }
 
   /**
    * Registers a callback to be invoked with every dispatched payload. Returns
    * a token that can be used with `waitFor()`.
-   *
-   * @param {function} callback
-   * @return {string}
    */
 
   Dispatcher.prototype.register = function register(callback) {
@@ -148,8 +146,6 @@ var Dispatcher = (function () {
 
   /**
    * Removes a callback based on its token.
-   *
-   * @param {string} id
    */
 
   Dispatcher.prototype.unregister = function unregister(id) {
@@ -161,8 +157,6 @@ var Dispatcher = (function () {
    * Waits for the callbacks specified to be invoked before continuing execution
    * of the current callback. This method should only be used by a callback in
    * response to a dispatched payload.
-   *
-   * @param {array<string>} ids
    */
 
   Dispatcher.prototype.waitFor = function waitFor(ids) {
@@ -180,8 +174,6 @@ var Dispatcher = (function () {
 
   /**
    * Dispatches a payload to all registered callbacks.
-   *
-   * @param {object} payload
    */
 
   Dispatcher.prototype.dispatch = function dispatch(payload) {
@@ -201,8 +193,6 @@ var Dispatcher = (function () {
 
   /**
    * Is this Dispatcher currently dispatching.
-   *
-   * @return {boolean}
    */
 
   Dispatcher.prototype.isDispatching = function isDispatching() {
@@ -213,7 +203,6 @@ var Dispatcher = (function () {
    * Call the callback stored with the given id. Also do some internal
    * bookkeeping.
    *
-   * @param {string} id
    * @internal
    */
 
@@ -226,7 +215,6 @@ var Dispatcher = (function () {
   /**
    * Set up bookkeeping needed when dispatching.
    *
-   * @param {object} payload
    * @internal
    */
 
@@ -246,7 +234,7 @@ var Dispatcher = (function () {
    */
 
   Dispatcher.prototype._stopDispatching = function _stopDispatching() {
-    this._pendingPayload = null;
+    delete this._pendingPayload;
     this._isDispatching = false;
   };
 
@@ -254,9 +242,70 @@ var Dispatcher = (function () {
 })();
 
 module.exports = Dispatcher;
-},{"./invariant":3}],3:[function(require,module,exports){
+},{"fbjs/lib/invariant":4}],3:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    draining = true;
+    var currentQueue;
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        var i = -1;
+        while (++i < len) {
+            currentQueue[i]();
+        }
+        len = queue.length;
+    }
+    draining = false;
+}
+process.nextTick = function (fun) {
+    queue.push(fun);
+    if (!draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],4:[function(require,module,exports){
+(function (process){
 /**
- * Copyright (c) 2014-2015, Facebook, Inc.
+ * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
  *
  * This source code is licensed under the BSD-style license found in the
@@ -266,7 +315,7 @@ module.exports = Dispatcher;
  * @providesModule invariant
  */
 
-'use strict';
+"use strict";
 
 /**
  * Use invariant() to assert state which your program assumes to be true.
@@ -280,7 +329,7 @@ module.exports = Dispatcher;
  */
 
 var invariant = function (condition, format, a, b, c, d, e, f) {
-  if (false) {
+  if (process.env.NODE_ENV !== 'production') {
     if (format === undefined) {
       throw new Error('invariant requires an error message argument');
     }
@@ -304,5 +353,6 @@ var invariant = function (condition, format, a, b, c, d, e, f) {
 };
 
 module.exports = invariant;
-},{}]},{},[1])(1)
+}).call(this,require('_process'))
+},{"_process":3}]},{},[1])(1)
 });
